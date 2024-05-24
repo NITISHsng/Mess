@@ -1,22 +1,523 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>HTML</title>
-  
-  <!-- HTML -->
-  
-
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Schedule</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <p>Nothing to see xbxhx here...</p>
-  <!-- Project -->
-  <script src="main.js"></script>
+    <div id="n_select">
+        <div>
+            <div id="your_name">
+                <label for="name">Select your name:</label>
+                <br>
+                <select id="name" name="name">
+                    <!-- Options will be dynamically populated here -->
+                </select>
+            </div>
+            <div>
+                <input type="number" id="pin" placeholder="Enter your pin">
+            </div>
+            <div>
+                <button id="n_submit">Submit</button>
+                <a href="MessManager.html"><button  class="m_butt">MESS MANAGER</button></a>
+</div>
+        </div>
+    </div>
+    <span id="toast">all toast message</span>
+    <div id="all_content" style="display: none;">
+        <header id="header">
+            <h2>Meal Schedule</h2>
+            <h7 id="user_name"></h7>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="contact.html">CONTACT</a></li>
+                <li><a href="item.html">ITEMS ROUTINE</a></li>
+                <li><a href="MessManager.html">MESS MANAGER</a></li>
+            </ul>
+        </nav>
+        <section id="content">
+            <h4>Meal Preferences</h4>
+            <button id="next_day">Next day</button>
+            <p id="meal_preference_text">Select your meal preference for Today:</p>
+            <form id="mealForm">
+                <input type="radio" id="monday_lunch" name="monday_meal" value="lunch">
+                <label for="monday_lunch">Lunch Only</label><br>
+                <input type="radio" id="monday_dinner" name="monday_meal" value="dinner">
+                <label for="monday_dinner">Dinner Only</label><br>
+                <input type="radio" id="monday_both" name="monday_meal" value="both">
+                <label for="monday_both">Both Lunch and Dinner</label><br>
+                <input type="radio" id="monday_opt_out" name="monday_meal" value="opt_out">
+                <label for="monday_opt_out">Opt Out</label><br><br>
+                <button id="guestCountBtn">Enter Number of Guests</button><br><br>
+                <div id="guestMealOptions"></div>
+                <input type="submit" value="Submit">
+            </form>
+            <div id="mealResults"></div>
+        </section>
+        <div id="table">
+            <h7>Meal chart</h7>
+            <table>
+                <tr>
+                    <th>s</th>
+                    <th>Name</th>
+                    <th>Prev day</th>
+                    <th>Today</th>
+                    <th>Next day</th>
+                </tr>
+            </table>
+        </div>
+        <footer>
+            <p>&copy; 2K24 Hostel Mess</p>
+        </footer>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfQErg1fpq6v0uTeZHsn3VRGeaUGU8CnY",
+            authDomain: "mess-e8b2b.firebaseapp.com",
+            projectId: "mess-e8b2b",
+            storageBucket: "mess-e8b2b.appspot.com",
+            messagingSenderId: "1097476946862",
+            appId: "1:1097476946862:web:cc6a252a88ce145923263f"
+        };
+    
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Function to fetch and populate names in the select element
+async function fetchAndPopulateNames() {
+    try {
+        const uniqueId = 21102002;
+        const docRef = db.collection('users').doc(uniqueId.toString());
+        const doc = await docRef.get();
+        if (doc.exists) {
+            const taskArray = doc.data().taskArray;
+            const nameSelect = document.getElementById('name');
+            taskArray.forEach(person => {
+                const option = document.createElement('option');
+                option.value = person.text;
+                option.text = person.text;
+                nameSelect.appendChild(option);
+            });
+        } else {
+            console.log('No such document!');
+            toast('No such document!');
+        }
+    } catch (error) {
+        console.error('Error fetching task array: ', error);
+        toast('Error fetching task array: ',error.massage,true);
+    }
+}
+
+// Function to fetch and print data in the table
+async function fetchAndPrintData() {
+    try {
+      // table data delete 
+      var table = document.querySelector('#table table');
+    var tdElements = table.querySelectorAll('td');
+    tdElements.forEach(function(td) {
+        td.remove();
+    });
+    
+        const uniqueId = 21102002;
+        const docRef = db.collection('users').doc(uniqueId.toString());
+        const doc = await docRef.get();
+        if (doc.exists) {
+            const taskArray = doc.data().taskArray;
+            const table = document.querySelector("table");
+            taskArray.forEach((person, index) => {
+                const row = table.insertRow();
+                row.insertCell(0).innerText = index + 1;
+                row.insertCell(1).innerText = person.text;
+                row.insertCell(2).innerText = person.prevM;
+                row.insertCell(3).innerText = person.todayM;
+                if(person.nextM=='0'){
+                  row.insertCell(4).innerText ="";
+                }else{
+                row.insertCell(4).innerText = person.nextM || ""; // Display nextM if it exists
+                }
+            });
+            
+        } else {
+            console.log('No such document!');
+            toast('No such document!');
+        }
+    } catch (error) {
+        console.error('Error fetching task array: ', error);
+        toast('Error fetching task array: ',error.massage,true);
+    }
+}
+
+fetchAndPopulateNames();
+fetchAndPrintData();
+
+let pins = [];
+document.getElementById('n_submit').addEventListener('click', async () => {
+  
+  
+    const selectElement = document.getElementById('name');
+    const selectedIndex = selectElement.selectedIndex;
+    const table = document.querySelector("table");
+    const rows = table.querySelectorAll("tr");
+
+    rows.forEach((row, index) => {
+        if (index === selectedIndex + 1) {
+            row.classList.add('highlighted');
+        } else {
+            row.classList.remove('highlighted');
+        }
+    });
+
+    try {
+        const uniqueId = 21102002;
+        const docRef = db.collection('users').doc(uniqueId.toString());
+        const doc = await docRef.get();
+        pins = [];
+        if (doc.exists) {
+            const taskArray = doc.data().taskArray;
+            taskArray.forEach(person => {
+                pins.push(person.pin);
+            });
+        } else {
+            console.log('No such document!');
+            toast('No such document!');
+        }
+        const selectElement = document.getElementById('name');
+        const selectedIndex = selectElement.selectedIndex;
+        let pin = document.getElementById('pin').value;
+        if (pins[selectedIndex] == pin) {
+          toast('Login successful! Welcome');
+            document.getElementById('n_select').style.display = 'none';
+            document.getElementById('all_content').style.display = 'block';
+            document.getElementById('user_name').innerHTML = document.getElementById('name').value;
+        } else {
+            console.log('Incorrect pin');
+            toast('Incorrect pin...!');
+        }
+    } catch (error) {
+        console.error('Error fetching task array: ', error);
+        toast('Error fetching task array: ',error.massage,true);
+    }
+});
+
+document.getElementById('mealForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var mondayMeal = document.querySelector('input[name="monday_meal"]:checked').value;
+    var guestMealPreferences = [];
+    var guestCount = document.getElementById('guestMealOptions').getElementsByTagName('select').length;
+    for (let i = 1; i <= guestCount; i++) {
+        var guestMealPreference = document.getElementById('guest' + i + '_meal').value;
+        guestMealPreferences.push(guestMealPreference);
+    }
+
+    var mealResults = document.getElementById('mealResults');
+    mealResults.innerHTML = "<h3>Meal Preferences for " + (nextDayMode ? "Tomorrow:" : "Today:") + "</h3>";
+    mealResults.innerHTML += "<p>Your Meal Preference: " + mondayMeal + "</p>";
+    mealResults.innerHTML += "<h5>Guest Meal Preferences:</h5>";
+
+    for (let i = 0; i < guestMealPreferences.length; i++) {
+        mealResults.innerHTML += "<p>Guest " + (i + 1) + ": " + guestMealPreferences[i] + "</p>";
+    }
+
+    console.log("Resident Meal Preference:", mondayMeal);
+    console.log("Guest Meal Preferences:", guestMealPreferences);
+
+    if (nextDayMode) {
+        updateNextDayMealTable(mondayMeal, guestMealPreferences);
+    } else {
+        updateMealTable(mondayMeal, guestMealPreferences);
+    }
+});
+
+function updateMealTable(residentMeal, guestMeals) {
+    const userName = document.getElementById('name').value;
+    const table = document.querySelector("table");
+    const selectElement = document.getElementById('name');
+    const selectedIndex = selectElement.selectedIndex;
+    let userRow = null;
+
+    for (let i = 1; i < table.rows.length; i++) {
+        if (table.rows[i].cells[1].innerHTML === userName) {
+            userRow = table.rows[i];
+            break;
+        }
+    }
+
+    let mealCode = "";
+    switch (residentMeal) {
+        case 'lunch':
+            mealCode = "1D";
+            break;
+        case 'dinner':
+            mealCode = "1R";
+            break;
+        case 'both':
+            mealCode = "2";
+            break;
+        default:
+            mealCode = "0";
+    }
+
+    let guestMealCount = {
+        'GD': 0,
+        'GR': 0,
+        'GDR': 0
+    };
+
+    guestMeals.forEach(guestMeal => {
+        switch (guestMeal) {
+            case 'lunch':
+                guestMealCount['GD']++;
+                break;
+            case 'dinner':
+                guestMealCount['GR']++;
+                break;
+            case 'both':
+                guestMealCount['GDR']++;
+                break;
+        }
+    });
+
+    for (const [key, value] of Object.entries(guestMealCount)) {
+        if (value > 0) {
+            mealCode += `+${value}${key}`;
+        }
+    }
+
+    if (userRow) {
+        userRow.cells[3].innerText = mealCode;
+
+        const uniqueId = 21102002; // Adjust this if the document ID is different
+        const docRef = db.collection('users').doc(uniqueId.toString());
+
+        docRef.get().then(doc => {
+            if (doc.exists) {
+                let taskArray = doc.data().taskArray;
+                taskArray[selectedIndex].todayM = mealCode;
+                docRef.update({
+                    taskArray: taskArray
+                }).then(() => {
+                    console.log("Document successfully updated!");
+                }).catch((error) => {
+                    console.error("Error updating document: ", error);
+                });
+            }
+        }).catch((error) => {
+            console.error("Error fetching document: ", error);
+            toast('Error fetching task array: ',error.massage,true);
+        });
+        console.log(mealCode);
+        toast(mealCode);
+    }
+}
+
+function updateNextDayMealTable(residentMeal, guestMeals) {
+    const userName = document.getElementById('name').value;
+    const table = document.querySelector("table");
+    const selectElement = document.getElementById('name');
+    const selectedIndex = selectElement.selectedIndex;
+    let userRow = null;
+
+    for (let i = 1; i < table.rows.length; i++) {
+        if (table.rows[i].cells[1].innerHTML === userName) {
+            userRow = table.rows[i];
+            break;
+        }
+    }
+
+    let mealCode = "";
+    switch (residentMeal) {
+        case 'lunch':
+            mealCode = "1D";
+            break;
+        case 'dinner':
+            mealCode = "1R";
+            break;
+        case 'both':
+            mealCode = "2";
+            break;
+        default:
+            mealCode = "0";
+    }
+
+    let guestMealCount = {
+        'GD': 0,
+        'GR': 0,
+        'GDR': 0
+    };
+
+    guestMeals.forEach(guestMeal => {
+        switch (guestMeal) {
+            case 'lunch':
+                guestMealCount['GD']++;
+                break;
+            case 'dinner':
+                guestMealCount['GR']++;
+                break;
+            case 'both':
+                guestMealCount['GDR']++;
+                break;
+        }
+    });
+
+    for (const [key, value] of Object.entries(guestMealCount)) {
+        if (value > 0) {
+            mealCode += `+${value}${key}`;
+        }
+    }
+
+    if (userRow) {
+       if(mealCode == '0'){
+         mealCode='×';
+       }
+         userRow.cells[4].innerText = mealCode; // Update the next day column
+        const uniqueId = 21102002; // Adjust this if the document ID is different
+        const docRef = db.collection('users').doc(uniqueId.toString());
+
+        docRef.get().then(doc => {
+            if (doc.exists) {
+                let taskArray = doc.data().taskArray;
+                taskArray[selectedIndex].nextM = mealCode;
+                docRef.update({
+                    taskArray: taskArray
+                }).then(() => {
+                    console.log("Document successfully updated!");
+                    toast("Document successfully updated!");
+                }).catch((error) => {
+                    console.error("Error updating document: ", error);
+                    toast("Error updating document: ", error.massage,true);
+                });
+            }
+        }).catch((error) => {
+            console.error("Error fetching document: ", error);
+            toast("Error fetching document: ", error.massage,true);
+        });
+
+        console.log(mealCode);
+        toast(mealCode);
+    }
+}
+
+let nextDayMode = false;
+
+document.getElementById('next_day').addEventListener('click', function() {
+    nextDayMode = !nextDayMode;
+    document.getElementById('meal_preference_text').innerText = nextDayMode ? 'Select your meal preference for Tomorrow:' : 'Select your meal preference for Today:';
+    this.innerText = nextDayMode ? 'Back to Today' : 'Next day';
+});
+
+document.getElementById('guestCountBtn').addEventListener('click', function() {
+    var guestCount = prompt("Enter the number of guests:");
+    var guestMealOptionsHTML = "";
+
+    for (let i = 1; i <= guestCount; i++) {
+        guestMealOptionsHTML += "<label for='guest" + i + "_meal'>Guest " + i + " Meal: </label>";
+        guestMealOptionsHTML += "<select id='guest" + i + "_meal' name='guest" + i + "_meal'>";
+        guestMealOptionsHTML += "<option value='both'>Both Lunch and Dinner</option>";
+        guestMealOptionsHTML += "<option value='lunch'>Lunch Only</option>";
+        guestMealOptionsHTML += "<option value='dinner'>Dinner Only</option>";
+        guestMealOptionsHTML += "</select><br><br>";
+    }
+
+    document.getElementById('guestMealOptions').innerHTML = guestMealOptionsHTML;
+});
+
+// Function to update the meals at the change of the day
+async function updateMealsAtDateChange() {
+    const uniqueId = 21102002;
+    const docRef = db.collection('users').doc(uniqueId.toString());
+    try {
+        const doc = await docRef.get();
+        if (doc.exists) {
+            let taskArray = doc.data().taskArray;
+
+            taskArray.forEach(task => {
+                // Move todayM to prevM
+                task.prevM = task.todayM;
+                // Move nextM to todayM if nextM is not empty
+               
+                   if(task.nextM=='×'){
+                    task.todayM = '0';
+                }else if(task.nextM==''){
+                  task.todayM = task.todayM;
+                }else{
+                  task.todayM=task.nextM;
+                }
+                // Clear nextM
+                task.nextM = "";
+            });
+
+            await docRef.update({ taskArray });
+            console.log("Meals updated for the new day!");
+            toast("Meals updated for the new day!");
+            fetchAndPrintData(); // Refresh the table data after update
+        } else {
+            console.log('No such document!');
+            toast('No such document!');
+        }
+    } catch (error) {
+        console.error("Error updating meals: ", error);
+        toast("Error updating meals: ", error.massage,true);
+    }
+}
+
+// Create a new Date object (for current date)
+const date = new Date();
+let day = date.getDate();
+let month = date.getMonth() + 1; 
+const year = date.getFullYear();
+day = day < 10 ? '0' + day : day;
+month = month < 10 ? '0' + month : month;
+const formattedDate = `${day}${month}${year}`;
+
+
+var lastDate;
+const Id=2110;
+var lastCheckedDate;
+const docRef = db.collection('lastdate').doc(Id.toString());
+docRef.get().then((doc) => {
+  if (doc.exists) {
+    const data = doc.data();
+    lastCheckedDate = data.lastCheckedDate;
+    console.log("Last Checked Date:", lastCheckedDate);
+  } else {
+    docRef.set({
+      lastCheckedDate: formattedDate
+    });
+  }
+});
+
+
+
+//console.log(typeof formattedDate);
+setInterval(() => {
+   // const currentDate = new Date().toDateString();
+    if (formattedDate !== lastCheckedDate) {
+        lastCheckedDate = formattedDate;
+      updateMealsAtDateChange();
+       console.log('calll');
+       lastCheckedDate = formattedDate; 
+       docRef.set({
+      lastCheckedDate: lastCheckedDate
+    });
+    }
+   
+},2000); 
+
+function toast(message) {
+  var toastElement = document.getElementById('toast');
+  toastElement.innerHTML = message;
+  toastElement.style.visibility = 'visible';
+
+  setTimeout(function() {
+    toastElement.style.visibility = 'hidden';
+  }, 2000);
+}
+    </script>
 </body>
 </html>
