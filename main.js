@@ -672,15 +672,13 @@ async function updateMealsAtDateChange() {
               task.nextM = ['0'];
             });
             await docRef.update({ taskArray });
-            console.log("Meals updated for the new day!");
-            toast("Meals updated for the new day!");
          fetchAndPrintData();
         } else {
-            console.log('No such document!');
+       
             toast('No such document!');
         }
     } catch (error) {
-        console.error("Error updating meals: ", error);
+     
         toast("Error updating meals: ", error.massage,true);
     }
     
@@ -720,13 +718,9 @@ async function saveDateToFirestore() {
                     // Check if the difference is exactly 1 day or more
                     if (differenceInDays === 1) {
                        updateMealsAtDateChange();
-                       console.log('call');
-                        alert('One day has passed since the saved date.');
                     } else if (differenceInDays > 1) {
-                        const daysOffMeal = Math.floor(differenceInDays - 1);
-                        alert(`${daysOffMeal} din off meal`);
-                        updateMealsAtDateChange();
-                        console.log('call more then 1 day');
+                        const daysOffMeal = Math.floor(differenceInDays - 1);                    
+                        updateMealsAtDateChange(); 
                     }
                 } else {
                     alert('No data in Firestore');
