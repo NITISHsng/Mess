@@ -9,7 +9,7 @@ body {
   background-color: #FFFFFF;
   color: #333;
   line-height: 1.6;
-  background-image: url('https://www.google.com/imgres?imgurl=https%3A%2F%2Fimg.freepik.com%2Ffree-vector%2Fgradient-network-connection-background_23-2148881320.jpg%3Fsize%3D626%26ext%3Djpg%26ga%3DGA1.1.2116175301.1719273600%26semt%3Dais_user&tbnid=_qCD9oEPnsxjlM&vet=1&imgrefurl=https%3A%2F%2Fwww.freepik.com%2Ffree-photos-vectors%2Fblockchain-background%2F2&docid=T_LDhK6Yn_S8GM&w=626&h=417&source=sh%2Fx%2Fim%2Fm1%2F0&kgs=38d168718f8155bc&shem=abme%2Ctrie');
+  background-image: url('/image/bg.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
