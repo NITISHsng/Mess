@@ -3,28 +3,76 @@ margin:0;
 padding:0;
 background-color:rgb(4,29,29);
 }
-#password-page{
-  height :100vh;
-  width: 100vw;
-  display:flex;
+    #password-page {
+  display: flex;
   justify-content: center;
   align-items: center;
-  animation: fadeIn 1s forwards;
+  height: 100vh;
+  background-color: #f0f0f0;
 }
-#password-page div input{
-  width :280px;
-  display:flex;
-  margin:auto;
-  margin-bottom: 20px;
-  padding: 5px;
+
+#password-page div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
-#password-page div button{
-  display:flex;
-  width :300px;
-  margin:auto;
+
+#password {
+  margin-bottom: 15px;
   padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  height :40px;
+  box-sizing: border-box;
+}
+
+#continue {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#continue:hover {
+  background-color: #45a049;
+}
+
+.hidden {
+  display: none;
+}
+
+#message {
+  margin-top: 10px;
+  font-size: 14px;
+  color: red;
+}
+
+
+.header{
+  width: 100%;
+  display: flex;
+  align-content: center;
   justify-content: center;
 }
+
+.header i{
+  height: 40px;
+  position: relative;
+  top: 30px;
+  left: 60px;
+}
+
 #container{
 margin:20px;
 padding:5px;
@@ -52,6 +100,214 @@ input{
  background-color:Rgb(50,60,60);
  color:white;
 }
+
+.edit_modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding-top: 30px;
+}
+
+.edit_modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 2px solid #888;
+  border-radius: 5px;
+  width: 80%;
+  max-width: 600px;
+  position: relative;
+}
+
+.edit_modal-content input {
+  margin-top: 5px;
+}
+
+/* Close button */
+.edit_modal .close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  border: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.edit_modal .close:hover {
+  color: black;
+}
+
+/* Save button */
+.edit_modal button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.edit_modal button:hover {
+  background-color: #45a049;
+}
+
+
+.sidebar_modal {
+    display: none;
+    z-index: 6;
+    right: 0;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, .6);
+}
+
+.sidebar_modal_content {
+    background-color: rgba(255, 252, 252, 0.2);
+    padding: 20px;
+    border: 2px solid #FFEDED;
+    box-shadow: 0 0 10px #FFFFFF; 
+    border-radius: 5px;
+    width: 210px;
+    position: absolute;
+    top: 100px;
+    right: 0;
+    text-align: left;
+}
+
+.sidebar_modal_content div {
+    margin-bottom: 40px;
+    position: relative;
+    left: 0;
+    font-weight: bold;
+    text-shadow: 0.1em 0.1em 0 hsl(200 50% 30%);
+}
+
+.sidebar_modal_content div i {
+    color: #00E9E099;
+}
+
+.sidebar_modal_content a,
+.modal_option {
+    text-decoration: none;
+    font-size: 14px;
+    padding: 6px;
+    border-radius: 5px;
+    box-shadow: 0 0 8px #FFFFFF;
+    border: 2px solid #646464;
+    background-color: rgba(112, 112, 112, 0.49);
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.sidebar_modal_content a:hover {
+    font-weight: bold;
+    color: red;
+}
+
+.close {
+    color: #aaa;
+    float: bottom;
+    font-size: 28px;
+    font-weight: bold;
+    
+}
+#xyz{
+  margin-bottom: -10px;
+}
+
+#customModal {
+  display: none;
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  text-align: center; 
+}
+
+#customModal .custom_modal-content {
+  background-color: #fefefe;
+  margin: auto; 
+  padding: 15px;
+  border: 2px solid #888;
+  border-radius: 5px;
+  width: 60%;
+  max-width: 600px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#customModal .custom_modal-content input[type="password"],
+#customModal .custom_modal-content button {
+  margin: 10px 0;
+  padding: 8px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#customModal .custom_modal-content button {
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+#customModal .custom_modal-content button:hover {
+  background-color: #45a049;
+}
+
+#customModal .custom_modal-content .close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #aaa;
+}
+
+#customModal .custom_modal-content .close:hover {
+  color: black;
+}
+    #customModal .close:hover {
+      color: black;
+    }
+
+    #customModal input[type="password"], #customModal button {
+      margin: 10px 0;
+      padding: 5px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    #customModal button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    #customModal button:hover {
+      background-color: #45a049;
+    }
+
 #add{
 height:35px;
 }
@@ -77,6 +333,9 @@ overflow:auto;
  position:absolute;
  right:10px;
 }
+.editicon{
+  margin-right: 30px;
+}
 .text div input{
  position:absolute;
  right:-25%;
@@ -94,102 +353,6 @@ overflow:auto;
   font-size: 16px;
   background-color:rgb(50,60,60);
 }
-
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgb(0,0,0);
-      background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-    }
-    .close:hover,
-    .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .editicon{
-      margin-right: 25px;
-      
-    }
-    
-    /* Modal styles */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-#myModal input[type="text"] {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-#myModal button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  float: right;
-}
-
-#myModal button:hover {
-  background-color: #45a049;
-}
-
 #toast {
   background-color: rgb(4,29,29);
   visibility: hidden;
@@ -202,3 +365,39 @@ overflow:auto;
   bottom: 5%;
   left: 20px;
 }
+ .amount-list{
+      width :100%;
+      max-height: 150px;
+      overflow-y: scroll;
+    }
+   .amu {
+  width: 90%;
+  overflow-x: scroll;
+  white-space: nowrap; 
+  padding-bottom: 12px;
+  margin-top: 5px;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  height: 40px;
+}
+
+.amu span {
+  font-size: 15px;
+  margin-bottom: 2px;
+  display: inline-block; 
+}
+
+.amu button {
+  color: rgba(94, 94, 94, 1);
+  background-color: transparent;
+  height:40px;
+  cursor: pointer;
+  width: 30px;
+  display: inline-block; 
+  padding: 5px;
+  font-weight: bold;
+  border: 1px solid #D4D4D4;
+  position: relative;
+  left: 25px;
+  bottom: 14px;
+  }
