@@ -441,11 +441,16 @@ document.getElementById("dltButton").addEventListener("click", async () => {
         // Deleting data from the "21102002" document
         const userDoc = await userDocRef.get();
         if (userDoc.exists) {
-            await userDocRef.update({
-                taskArray: firebase.firestore.FieldValue.delete(),
-                uniqueid: firebase.firestore.FieldValue.delete(),
-            });
-        } else {
+    const data = userDoc.data();
+    const taskArray = data.taskArray || [];
+    for (let i = 0; i < taskArray.length; i++) {
+        taskArray[i].totalMeal = [];
+    }
+    await userDocRef.update({
+        taskArray: taskArray,
+        uniqueid: firebase.firestore.FieldValue.delete(),
+    });
+   }else {
             console.log("No such user document!");
         }
 
