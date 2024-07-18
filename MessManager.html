@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HTML</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="StyleManager.css">
   <style>
   </style>
@@ -15,219 +16,103 @@
     <div>
       <input type="password" placeholder="Enter password" id="password">
       <button id="continue">SUBMIT</button>
+        <p id="message" class="hidden"></p>
     </div>
   </div>
+  
   <div id="container" style="display: none;">
-    <div>
-      <h2>Add person</h2>
+  <div class="header">
+      <span><h2>Add person</h2></span>
+      <span> <i class="fa-solid fa-bars" id="settings"></i></span>
     </div>
     <div>
+    <div>
       <input id="inp" type="text" placeholder="Add person">
-      <button onclick="add()" id="add">Add</button>
+      <button id="add">Add</button>
     </div>
     <div class="text"></div>
     <button id="dlt-all-task" class="buttons">Remove ALL Person</button>
   </div>
 
   <!-- The Modal -->
-  <div id="myModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
+  <div id="myModal" class="edit_modal">
+    <div class="edit_modal-content">
+      <div class="close">&times;</div>
+      <br>
       <input type="hidden" id="editIndex">
       <input type="text" id="editName" placeholder="Edit person">
       <input type="text" id="editPin" placeholder="Edit pin" readonly>
       <input type="text" id="editPrevM" placeholder="Edit prevM">
       <input type="text" id="editTodayM" placeholder="Edit todayM">
       <input type="text" id="editNextM" placeholder="Edit nextM">
-      <button onclick="saveEdit()">Save</button>
+      <br>
+      <button id="edit_value_save">Save</button>
+      <hr>
+      <label for="amount">Enter Amount:</label>
+  <input type="number" id="amount" name="amount">
+  <br>
+  <label for="message">Enter Message:</label>
+  <input type="text" id="amount_related_message" name="message">
+   <button id="saveAmount">Add amount</button>
+
+  <div class="amount-list" id="amount-list"></div>
+
     </div>
   </div>
  <span id="toast">all toast message</span>
+ 
+   <div id="sidebar" class="sidebar_modal">
+    <div class="sidebar_modal_content">
+      
+         <div>
+                         <a href="item.html"><i class="fa-solid fa-list"></i>&nbsp; ITEMS</a>
+         </div>
+       
+         <div>
+            <a href="index.html"><i class="fa-solid fa-house"></i>&nbsp; HOME</a>
+         </div>
+         
+         <div>
+                <a href="contact.html"><i class="fa-solid fa-phone"></i>&nbsp; CONTACT</a>
+         </div>
+         <div>
+         <a href="totalMeal.html">  <i class="fa-solid fa-equals"></i> &nbsp;TOTAL MEAL</a>
+       </div>
+ 
+          <div>
+                <a href="MessManager.html">
+                  <i class="fa-solid fa-street-view"></i>&nbsp; MESS MANAGER</a>
+            </div>
+         
+
+               <div id="password_change">
+                 
+                      <span class="modal_option">
+                    <i class="fa-solid fa-lock"></i>&nbsp; PASSWORD CHANGE 
+                      </span>
+               </div>
+               <div id="xyz">
+                 <span class="close">&times;</span>
+               </div>
+    </div>
+  </div>
+
+  
+  
+  
+  
+    <!-- Custom Modal for Password Change -->
+  <div id="customModal" class="custom_modal">
+    <div class="custom_modal-content" id="password_modal">
+      <input type="password" id="old_password" placeholder="Enter old password">
+      <input type="password" id="new_password" placeholder="Enter new password">
+      <button id="password_change_button">Change Password</button>
+       <br>
+         <span class="close" onclick="closeCustomModal()">&times;</span>
+    </div>
+  </div>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-<script>
-  // Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBfQErg1fpq6v0uTeZHsn3VRGeaUGU8CnY",
-  authDomain: "mess-e8b2b.firebaseapp.com",
-  projectId: "mess-e8b2b",
-  storageBucket: "mess-e8b2b.appspot.com",
-  messagingSenderId: "1097476946862",
-  appId: "1:1097476946862:web:cc6a252a88ce145923263f"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-let inputs = document.getElementById("inp");
-let text = document.querySelector(".text");
-let task = [];
-
-async function fetchTasks() {
-  try {
-    const uniqueId = 21102002;
-    const docRef = db.collection('users').doc(uniqueId.toString());
-    const doc = await docRef.get();
-    if (doc.exists) {
-      task = doc.data().taskArray || [];
-      renderTasks();
-    } else {
-      toast('No such document!');
-    }
-  } catch (error) {
-    toast('Error fetching task array: ' + error.message, true);
-  }
-}
-
-function renderTasks() {
-  text.innerHTML = ''; // Clear existing tasks
-  task.forEach((taskItem, index) => {
-    document.getElementById("dlt-all-task").style.display = 'block'; 
-    let ele = document.createElement("div");
-    // Concatenate the index to the taskItem.text to display numbers
-    ele.innerHTML = `<span>${index + 1}. ${taskItem.text} - ${taskItem.pin}</span> <i class="material-icons edit-btn editicon">edit</i> <i class="material-icons delete-btn">delete</i>`;
-    text.appendChild(ele);
-    ele.querySelector(".delete-btn").addEventListener("click", remove);
-    ele.querySelector(".edit-btn").addEventListener("click", () => edit(index));
-  });
-}
-
-function add() {
-  if (inputs.value == "") {
-    alert("Add Name");
-  } else {
-    const randomPin = Math.floor(1000 + Math.random() * 9000).toString(); // Generate 4-digit pin
-    document.getElementById("dlt-all-task").style.display = 'block'; 
-    let person = { text: inputs.value, pin: randomPin, prevM: '0', todayM: '0', nextM: '0' };
-    task.unshift(person);
-    saveTasksToFirestore('add');
-    renderTasks();
-    inputs.value = "";
-  }
-}
-
-document.getElementById("dlt-all-task").onclick = function () {
-  if (confirm("Are you sure you want to delete all your tasks?")) {
-    task = [];
-    saveTasksToFirestore('delete');
-    renderTasks();
-    document.getElementById("dlt-all-task").style.display = 'none'; 
-  }
-}
-
-function remove() {
-  let ele = this.parentNode;
-  if (confirm("Are you sure you want to delete this person?")) {
-    let index = Array.from(ele.parentNode.children).indexOf(ele);
-    task.splice(index, 1);
-    saveTasksToFirestore('delete');
-    renderTasks();
-  }
-}
-
-function edit(index) {
-  const person = task[index];
-  document.getElementById('editIndex').value = index;
-  document.getElementById('editName').value = person.text;
-  document.getElementById('editPin').value = person.pin;
-  document.getElementById('editPrevM').value = person.prevM;
-  document.getElementById('editTodayM').value = person.todayM;
-  document.getElementById('editNextM').value = person.nextM;
-  document.getElementById('myModal').style.display = "block";
-}
-
-function saveEdit() {
-  const index = document.getElementById('editIndex').value;
-  const newName = document.getElementById('editName').value;
-  const newPrevM = document.getElementById('editPrevM').value;
-  const newTodayM = document.getElementById('editTodayM').value;
-  const newNextM = document.getElementById('editNextM').value;
-
-  if (newName) {
-    task[index].text = newName;
-    task[index].prevM = newPrevM;
-    task[index].todayM = newTodayM;
-    task[index].nextM = newNextM;
-    saveTasksToFirestore('edit');
-    renderTasks();
-    document.getElementById('myModal').style.display = "none";
-  } else {
-    alert("Name cannot be empty");
-  }
-}
-
-async function saveTasksToFirestore(operation) {
-  try {
-    const uniqueId = 21102002;
-    const docRef = db.collection('users').doc(uniqueId.toString());
-    await docRef.set({
-      uniqueId: uniqueId,
-      taskArray: task
-    });
-    if (operation === 'add') {
-      toast('User added');
-    } else if (operation === 'delete') {
-      toast('User deleted');
-    } else if (operation === 'edit') {
-      toast('User edited');
-    }
-  } catch (error) {
-    toast('Error saving task: ' + error.message, true);
-  }
-}
-
-// Modal close functionality
-let modal = document.getElementById('myModal');
-let span = document.getElementsByClassName("close")[0];
-span.onclick = function() {
-  modal.style.display = "none";
-}
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
-
-document.getElementById('continue').onclick = function () {
-  const password = document.getElementById('password').value;
-  const storedPassword = JSON.parse(localStorage.getItem('Lpassword'));
-  if (password === formattedDate) {
-    localStorage.setItem('Lpassword', JSON.stringify(password));
-    document.getElementById('password-page').style.display = 'none';
-    document.getElementById('container').style.display = 'block';
-    fetchTasks(); // Fetch and display tasks when the user successfully logs in
-  } else if (storedPassword && password === storedPassword) {
-    document.getElementById('password-page').style.display = 'none';
-    document.getElementById('container').style.display = 'block';
-    fetchTasks(); // Fetch and display tasks when the user successfully logs in
-  } else {
-    alert('Wrong password');
-  }
-}
-
-const currentDate = new Date();
-const day = currentDate.getDate().toString().padStart(2, '0'); 
-const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-const year = currentDate.getFullYear().toString().slice(-2);
-const formattedDate = 'GCELT' + day + month + year;
-
-const storedPassword = JSON.parse(localStorage.getItem('Lpassword'));
-if (storedPassword == formattedDate) {
-  document.getElementById('password-page').style.display = 'none';
-  document.getElementById('container').style.display = 'block';
-  fetchTasks(); 
-}
-
-function toast(message) {
-  var toastElement = document.getElementById('toast');
-  toastElement.innerHTML = message;
-  toastElement.style.visibility = 'visible';
-
-  setTimeout(function() {
-    toastElement.style.visibility = 'hidden';
-  }, 2000);
-}
-
-</script>
-
+    <script type="module" src="manager.js"></script>
 </body>
 </html>
