@@ -1,12 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Meal Chart and Going to Market List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+        }
+        table.daily-meal-chart {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table.daily-meal-chart caption {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        table.daily-meal-chart th, table.daily-meal-chart td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #f2f2f2; 
+        }
+
+        table.daily-meal-chart td {
+            white-space: nowrap;
+        }
+
+        table.daily-meal-chart tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table.daily-meal-chart tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        /* CSS for  Market Table */
+        table.going-to-market {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table.going-to-market caption {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        table.going-to-market th, table.going-to-market td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        table.going-to-market tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table.going-to-market tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+    </style>
 </head>
 <body>
-  <p>Comming soon more features....</p>
+<table class="daily-meal-chart">
+    <caption>Daily Meal Chart</caption>
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Meal at Noon</th>
+            <th>Meal at Night</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Monday</td>
+            <td>মাছ ভাত<br>Fish Curry</td>
+            <td>সোয়াবিন & ডাল<br>Soya Bean & Dal</td>
+        </tr>
+        <tr>
+            <td>Tuesday</td>
+            <td>শাক & ডাল<br>Vegetables & Dal</td>
+            <td>ডিম ভাত<br>Egg Curry</td>
+        </tr>
+        <tr>
+            <td>Wednesday</td>
+            <td>ডাল & আলুভাজা<br>Dal & Fried Potatoes</td>
+            <td>মুরগির মাংস <br>Chicken Curry</td>
+        </tr>
+        <tr>
+            <td>Thursday</td>
+            <td>সবজি & ডাল<br>Mixed Vegetable & Dal</td>
+            <td>ডিম ভাত<br>Egg Curry & Rice</td>
+        </tr>
+        <tr>
+            <td>Friday</td>
+            <td>মাছ ভাত<br>Fish Curry & Rice</td>
+            <td>সোয়াবিন & ডাল<br>Soya Bean & Dal</td>
+        </tr>
+        <tr>
+            <td>Saturday</td>
+            <td>সবজি & ডাল<br>Mixed Vegetable & Dal</td>
+            <td>ডিম <br>Egg Curry</td>
+        </tr>
+        <tr>
+            <td>Sunday</td>
+            <td>ডাল ভাত & আলুভাজা<br>Dal & Fried Potatoes</td>
+            <td>মুরগির মাংস <br>Chicken Curry</td>
+        </tr>
+    </tbody>
+</table>
+<hr>
+<table class="going-to-market">
+    <caption>List of Going to Market</caption>
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Names</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Sunday</td>
+            <td>Afzal, Amit, Mohit</td>
+        </tr>
+        <tr>
+            <td>Monday</td>
+            <td>Soumyakanti, Tanmoy</td>
+        </tr>
+        <tr>
+            <td>Tuesday</td>
+            <td>Asim, Akash, Anup</td>
+        </tr>
+        <tr>
+            <td>Wednesday</td>
+            <td>Sk Mainuddin, Sayan</td>
+        </tr>
+        <tr>
+            <td>Thursday</td>
+            <td>Nitish, Rupankar</td>
+        </tr>
+        <tr>
+            <td>Friday</td>
+            <td>Debdip, Priyojit</td>
+        </tr>
+        <tr>
+            <td>Saturday</td>
+            <td>Arpan, Abhishek</td>
+        </tr>
+    </tbody>
+</table>
 </body>
 </html>
