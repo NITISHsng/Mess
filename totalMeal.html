@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Today's Meals</title>
+    <style>
+        body {
+            margin: 10px;
+            font-family: Arial, sans-serif;
+        }
+        #tableContainer{
+          max-height:570px;
+        }
+
+        table {
+            
+            width: 100%;
+            overflow-x: auto;
+            margin: 0px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td {
+            cursor: pointer;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #e1e1e1;
+        }
+
+        tbody {
+            overflow-x: auto;
+            position: relative;
+        }
+
+        td:first-child, th:first-child {
+            position: sticky;
+            left: 0;
+            background-color: #fff;
+            z-index: 1;
+        }
+        tr:first-child{
+          position: sticky;
+          top: 0;
+          background-color: #fff;
+          z-index: 4;
+        }
+
+        th:first-child {
+            background-color: #f2f2f2;
+            z-index: 2;
+        }
+
+        #tableContainer {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+        #dltButton {
+        background-color: #FF0000;
+    }
+
+    #dltButton:hover {
+        background-color: #D00000;
+    }
+    </style>
+</head>
+<body>
+    <h1>Total Meals:-</h1>
+    <button id="addTodayMealButton">Add today's meal</button>
+    <button id="saveButton">Save</button>
+    <div id="tableContainer"></div>
+    <button id="dltButton">All deleted</button>
+
+    <!-- Firebase Firestore SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfQErg1fpq6v0uTeZHsn3VRGeaUGU8CnY",
+            authDomain: "mess-e8b2b.firebaseapp.com",
+            projectId: "mess-e8b2b",
+            storageBucket: "mess-e8b2b.appspot.com",
+            messagingSenderId: "1097476946862",
+            appId: "1:1097476946862:web:cc6a252a88ce145923263f"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function fetchAndGenerateTable() {
+            try {
+                const uniqueId = 21102002;
+                const docRef = db.collection('users').doc(uniqueId.toString());
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const taskArray = doc.data().taskArray;
+                    const names = taskArray.map(item => item.text);
+                    const mealDataArray = taskArray.map(item => item.totalMeal);
+                    const AmountArray = taskArray.map(item => item.amountArray);
+                    generateTable(names, mealDataArray,AmountArray);
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        function formatDate(dateString) {
+            const day = dateString.slice(6, 8);
+            const month = dateString.slice(4, 6);
+            const year = dateString.slice(0, 4);
+            return `${day}/${month}/${year}`;
+        }
+
+        function decodeCode(code) {
+            let R = 0;
+            let G = 0;
+            let parts = code.split('+');
+            parts.forEach(part => {
+                let number = parseInt(part);
+                if (isNaN(number)) {
+                    number = 1;
+                }
+
+                if (part.includes('GDR')) {
+                    G += number * 2;
+                } else if (part.includes('2')) {
+                    R += number;
+                } else if (part.includes('GD') || part.includes('GR')) {
+                    G += number;
+                } else if (part.includes('R') || part.includes('D')) {
+                    R += number;
+                }
+            });
+
+            return { R, G };
+        }
+let AllTotalAmount=0;
+        function generateTable(names, mealDataArray,AmountArray) {
+   
+            const tableContainer = document.getElementById("tableContainer");
+            const table = document.createElement("table");
+
+            const headerRow = document.createElement("tr");
+            const firstHeaderCell = document.createElement("th");
+            firstHeaderCell.textContent = "Name \\ Date";
+            headerRow.appendChild(firstHeaderCell);
+
+            const dates = new Set();
+            
+            mealDataArray.forEach(mealData => {
+                mealData.forEach(meal => {
+                    const date = meal.split('-')[0];
+                    dates.add(date);
+                });
+            });
+
+            const sortedDates = Array.from(dates).sort();
+
+            sortedDates.forEach(date => {
+                const headerCell = document.createElement("th");
+                headerCell.textContent = formatDate(date);
+                headerRow.appendChild(headerCell);
+            });
+
+            const totalHeaderCell = document.createElement("th");
+            totalHeaderCell.textContent = "Total Meal / Hade";
+            const AmountHeaderCell = document.createElement("th");
+            AmountHeaderCell.textContent = "Amount/Hade";
+            headerRow.appendChild(totalHeaderCell);
+            headerRow.appendChild(AmountHeaderCell);
+            table.appendChild(headerRow);
+
+            const totals = {
+                TD: Array(sortedDates.length).fill(0),
+                TR: Array(sortedDates.length).fill(0),
+                TDR: Array(sortedDates.length).fill(0)
+            };
+            
+
+            names.forEach((name, nameIndex) => {
+                const row = document.createElement("tr");
+                const nameCell = document.createElement("td");
+                nameCell.textContent = name;
+                row.appendChild(nameCell);
+
+                let totalR = 0;
+                let totalG = 0;
+                sortedDates.forEach((date, dateIndex) => {
+                    var mealData = mealDataArray[nameIndex].find(meal => meal.startsWith(date));
+                    if (!mealData || mealData === "×") {
+                        mealData = `${date}-×`;
+                    }
+                    const cell = document.createElement("td");
+                    if (mealData) {
+                        const mealDetails = mealData.split('-')[1];
+                        cell.textContent = mealDetails;
+                        const { R, G } = decodeCode(mealDetails);
+                        totalR += R;
+                        totalG += G;
+                        totals.TD[dateIndex] += R;
+                        totals.TR[dateIndex] += G;
+                        totals.TDR[dateIndex] += (R + G);
+                        cell.addEventListener('click', () => {
+                            const oldValue = cell.textContent.trim();
+                            const newValue = prompt("Enter new value:", oldValue);
+
+                            if (newValue !== null && newValue !== '') {
+                                cell.textContent = newValue;
+
+                                mealDataArray[nameIndex] = mealDataArray[nameIndex].map(meal => {
+                                    if (meal.startsWith(date)) {
+                                        return `${date}-${newValue}`;
+                                    }
+                                    return meal;
+                                });
+                            } else {
+                                
+                            }
+                        });
+                    } else {
+                        cell.textContent = "×";
+                        cell.classList.add("editable");
+                    }
+                    row.appendChild(cell);
+                });
+
+                const totalCell = document.createElement("td");
+                totalCell.innerHTML = `Rm=${totalR},Gm=${totalG},Tm=${totalR + totalG}`;
+                row.appendChild(totalCell);
+                table.appendChild(row);
+                           
+let abc= AmountArray[nameIndex];
+let totalAmount = 0;  
+for (let i = 0; i < abc.length; i++) {
+    totalAmount += parseInt(abc[i].amount);
+}
+AllTotalAmount += totalAmount;  
+                const Amount = document.createElement("td");
+                Amount.innerHTML =totalAmount;
+                row.appendChild(Amount);
+                
+                table.appendChild(row);
+            });
+
+            const totalRow = document.createElement("tr");
+            const totalLabelCell = document.createElement("td");
+            totalLabelCell.textContent = "Total Meal / Day";
+            totalRow.appendChild(totalLabelCell);
+
+            totals.TD.forEach((td, index) => {
+                const totalCell = document.createElement("td");
+                totalCell.innerHTML = `TDR=${totals.TDR[index]}`;
+                totalRow.appendChild(totalCell);
+            });
+
+            let totalT = 0;
+            totals.TDR.forEach(total => {
+                totalT += total;
+            });
+            const totalTCell = document.createElement("td");
+            totalTCell.textContent = `Total Meal=${totalT}`;
+           const AllAmout = document.createElement("td");
+            AllAmout.textContent =`${AllTotalAmount}`;
+            totalRow.appendChild(totalTCell);
+            totalRow.appendChild(AllAmout);
+            table.appendChild(totalRow);
+            tableContainer.innerHTML = "";
+            tableContainer.appendChild(table);
+        }
+
+        document.getElementById("addTodayMealButton").addEventListener("click", async () => {
+            try {
+                const uniqueId = 21102002;
+                const docRef = db.collection('users').doc(uniqueId.toString());
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const taskArray = doc.data().taskArray;
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const todayDate = `${year}${month}${day}`;
+
+                    const updatedTaskArray = taskArray.map((item) => {
+                        const todayMeals = item.todayM;
+                        const todayMealsEncoded = todayMeals.map((meal, index) => {
+                            if (index === 0) {
+                                if (meal === "lunch") return "1D";
+                                if (meal === "dinner") return "1R";
+                                if (meal === "both") return "2";
+                                if (meal === "×") return "×";
+                            } else {
+                                if (meal === "lunch") return "1GD";
+                                if (meal === "dinner") return "1GR";
+                                if (meal === "both") return "1GDR";
+                                if (meal === "×") return "×";
+                            }
+                        }).join("+");
+                        return {
+                            ...item,
+                            todayM: todayMeals,
+                            totalMeal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
+                        };
+                    });
+
+                    await docRef.update({
+                        taskArray: updatedTaskArray
+                    });
+
+                    alert("Today's meal added successfully!");
+
+                    fetchAndGenerateTable();
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.error("Error adding today's meal:", error);
+            }
+        });
+
+        document.getElementById("saveButton").addEventListener("click", async () => {
+            try {
+                const uniqueId = 21102002;
+                const docRef = db.collection('users').doc(uniqueId.toString());
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const taskArray = doc.data().taskArray;
+
+                    const table = document.querySelector('table');
+                    const rows = table.querySelectorAll('tr');
+
+                    rows.forEach((row, index) => {
+                        if (index === 0) {
+                            return;
+                        }
+
+                        const cells = row.querySelectorAll('td');
+                        const name = cells[0].textContent.trim();
+
+                        const newData = [];
+
+                        for (let i = 1; i < cells.length - 2; i++) {
+                            const cell = cells[i];
+                            const dateHeading = table.rows[0].cells[i].textContent.trim();
+                            const date = formatDateForFirebase(dateHeading);
+
+                            let value = cell.textContent.trim();
+
+                            if (value === '×') {
+                                continue;
+                            }
+
+                            const formattedDate = `${date}-${value}`;
+                            newData.push(formattedDate);
+                        }
+
+                        const nameIndex = taskArray.findIndex(item => item.text === name);
+                        if (nameIndex !== -1) {
+                            taskArray[nameIndex].totalMeal = newData;
+                        }
+                    });
+
+                    await docRef.update({
+                        taskArray: taskArray
+                    });
+
+                    alert("Changes saved successfully!");
+                    AllTotalAmount=0;
+
+                    fetchAndGenerateTable();
+                    
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.error("Error saving changes:", error);
+            }
+        });
+
+        function formatDateForFirebase(dateString) {
+            const [day, month, year] = dateString.split('/');
+            return `${year}${month}${day}`;
+        }
+
+        fetchAndGenerateTable();
+// Add event listener for the delete button
+document.getElementById("dltButton").addEventListener("click", async () => {
+    try {
+        // First confirmation
+        const firstConfirmation = confirm("Do you want to delete all data?");
+        if (!firstConfirmation) return;
+
+        // Second confirmation
+        const secondConfirmation = confirm("Are you sure you want to delete all data?");
+        if (!secondConfirmation) return;
+
+        const uniqueId = 21102002;
+        const MuniqueId = 'manager'; // Unique ID for the manager document
+
+        const userDocRef = db.collection('users').doc(uniqueId.toString());
+        const managerDocRef = db.collection('users').doc(MuniqueId);
+
+        // Deleting data from the "21102002" document
+        const userDoc = await userDocRef.get();
+        if (userDoc.exists) {
+            await userDocRef.update({
+                taskArray: firebase.firestore.FieldValue.delete(),
+                uniqueid: firebase.firestore.FieldValue.delete(),
+            });
+        } else {
+            console.log("No such user document!");
+        }
+
+        // Deleting data from the "manager" document
+        const managerDoc = await managerDocRef.get();
+        if (managerDoc.exists) {
+            await managerDocRef.update({
+                password: firebase.firestore.FieldValue.delete(),
+                uniqueIDs: firebase.firestore.FieldValue.delete(),
+                visitorCount: firebase.firestore.FieldValue.delete()
+            });
+        } else {
+            console.log("No such manager document!");
+        }
+
+        alert("All data deleted successfully!");
+
+        // Clear the table
+        document.getElementById("tableContainer").innerHTML = "";
+    } catch (error) {
+        console.error("Error deleting data:", error);
+    }
+});
+    </script>
+      <button onclick="downloadTableAsCSV('Mess_Table.csv')">Download Table</button>
+    
+      <script>
+      
+        function downloadTableAsCSV(filename) {
+          filename=new Date();
+          let tables = document.getElementsByTagName("table");           let table = tables[0]; 
+          let rows = Array.from(table.querySelectorAll("tr"));
+          let csvContent = rows.map(row => {
+            let cells = Array.from(row.querySelectorAll("th, td"));
+            return cells.map(cell => `"${cell.textContent}"`).join(",");
+          }).join("\n");
+    
+          let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          let link = document.createElement("a");
+          if (link.download !== undefined) { // feature detection
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        }
+      </script>
+</body>
+</html>
