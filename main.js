@@ -263,7 +263,7 @@ rows.forEach(function(row, index) {
 
            let nextM = updateMeal(residentNext,guestNext);
 
-                row.insertCell(2).innerText = prevM;
+                row.insertCell(2).innerText = '¥';
                 row.insertCell(3).innerText = todayM; 
                 if (nextM == '0') {
                     row.insertCell(4).innerText = '';
