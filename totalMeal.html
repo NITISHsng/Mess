@@ -501,9 +501,10 @@ document.getElementById("dltButton").addEventListener("click", async () => {
           }
         }
       </script>
-             <script>
+                   <script>
         document.addEventListener('DOMContentLoaded', function() {
             const accessToken = localStorage.getItem('accessToken');
+            alert(accessToken);
             if (accessToken !== 'granted') {
                 alert('You cannot access this page directly.');
                 window.location.href = 'manager.html';
@@ -511,6 +512,6 @@ document.getElementById("dltButton").addEventListener("click", async () => {
                 localStorage.removeItem('accessToken');
             }
         });
-    </script>
+                   </script>
 </body>
 </html>
