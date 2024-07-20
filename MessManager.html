@@ -76,7 +76,7 @@
                 <a href="contact.html"><i class="fa-solid fa-phone"></i>&nbsp; CONTACT</a>
          </div>
          <div>
-         <a href="totalMeal.html">  <i class="fa-solid fa-equals"></i> &nbsp;TOTAL MEAL</a>
+         <a href="totalMeal.html">  <i class="fa-solid fa-equals" onclick="setAccessToken()"></i> &nbsp;TOTAL MEAL</a>
        </div>
  
           <div>
@@ -114,5 +114,11 @@
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <script type="module" src="manager.js"></script>
+     <script>
+      function setAccessToken() {
+        localStorage.setItem('accessToken', 'granted');
+        window.location.href = 'totalMeal.html';
+      }
+     </script>
 </body>
 </html>
