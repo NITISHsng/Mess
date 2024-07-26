@@ -106,7 +106,7 @@
     <!-- Firebase Firestore SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-    <script>
+    <script type="module">
         const firebaseConfig = {
             apiKey: "AIzaSyBfQErg1fpq6v0uTeZHsn3VRGeaUGU8CnY",
             authDomain: "mess-e8b2b.firebaseapp.com",
@@ -305,120 +305,142 @@ AllTotalAmount += totalAmount;
         }
 
         document.getElementById("addTodayMealButton").addEventListener("click", async () => {
-            try {
-                const uniqueId = 21102002;
-                const docRef = db.collection('users').doc(uniqueId.toString());
-                const doc = await docRef.get();
+    try {
+        const uniqueId = 21102002;
+        const docRef = db.collection('users').doc(uniqueId.toString());
+        const doc = await docRef.get();
 
-                if (doc.exists) {
-                    const taskArray = doc.data().taskArray;
-                    const today = new Date();
-                    const year = today.getFullYear();
-                    const month = String(today.getMonth() + 1).padStart(2, '0');
-                    const day = String(today.getDate()).padStart(2, '0');
-                    const todayDate = `${year}${month}${day}`;
+        if (doc.exists) {
+            const data = doc.data();
+            const taskArray = data.taskArray || []; // Ensure taskArray is defined
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayDate = `${year}${month}${day}`;
 
-                    const updatedTaskArray = taskArray.map((item) => {
-                        const todayMeals = item.todayM;
-                        const todayMealsEncoded = todayMeals.map((meal, index) => {
-                            if (index === 0) {
-                                if (meal === "lunch") return "1D";
-                                if (meal === "dinner") return "1R";
-                                if (meal === "both") return "2";
-                                if (meal === "×") return "×";
-                            } else {
-                                if (meal === "lunch") return "1GD";
-                                if (meal === "dinner") return "1GR";
-                                if (meal === "both") return "1GDR";
-                                if (meal === "×") return "×";
-                            }
-                        }).join("+");
-                        return {
-                            ...item,
-                            todayM: todayMeals,
-                            totalMeal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
-                        };
-                    });
+            const updatedTaskArray = taskArray.map(item => {
+                const todayMeals = item.todayM || []; // Ensure todayMeals is defined
+                
+                const firstMeal = todayMeals[0];
+                let firstMealEncoded;
+                if (firstMeal === "lunch") firstMealEncoded = "1D";
+                if (firstMeal === "dinner") firstMealEncoded = "1R";
+                if (firstMeal === "both") firstMealEncoded = "2";
+                if (firstMeal === "×") firstMealEncoded = "×";
 
-                    await docRef.update({
-                        taskArray: updatedTaskArray
-                    });
+                let lunchCount = 0;
+                let dinnerCount = 0;
+                let bothCount = 0;
 
-                    alert("Today's meal added successfully!");
-
-                    fetchAndGenerateTable();
-                } else {
-                    console.log("No such document!");
+                for (let i = 1; i < todayMeals.length; i++) {
+                    if (todayMeals[i] === "lunch") lunchCount++;
+                    if (todayMeals[i] === "dinner") dinnerCount++;
+                    if (todayMeals[i] === "both") bothCount++;
                 }
-            } catch (error) {
-                console.error("Error adding today's meal:", error);
-            }
-        });
 
-        document.getElementById("saveButton").addEventListener("click", async () => {
-            try {
-                const uniqueId = 21102002;
-                const docRef = db.collection('users').doc(uniqueId.toString());
-                const doc = await docRef.get();
+                const lunchEncoded = lunchCount > 0 ? `${lunchCount}GD` : "";
+                const dinnerEncoded = dinnerCount > 0 ? `${dinnerCount}GR` : "";
+                const bothEncoded = bothCount > 0 ? `${bothCount}GDR` : "";
 
-                if (doc.exists) {
-                    const taskArray = doc.data().taskArray;
+                const todayMealsEncoded = [firstMealEncoded, lunchEncoded, dinnerEncoded, bothEncoded]
+                    .filter(Boolean)  // Remove empty strings
+                    .join("+");
 
-                    const table = document.querySelector('table');
-                    const rows = table.querySelectorAll('tr');
+                return {
+                    ...item,
+                    totalMeal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
+                };
+            });
 
-                    rows.forEach((row, index) => {
-                        if (index === 0) {
-                            return;
-                        }
+            await docRef.update({
+                taskArray: updatedTaskArray
+            });
 
-                        const cells = row.querySelectorAll('td');
-                        const name = cells[0].textContent.trim();
+            alert("Today's meal added successfully!");
 
-                        const newData = [];
+            fetchAndGenerateTable();
+        } else {
+            console.log("No such document!");
+        }
+    } catch (error) {
+        console.error("Error adding today's meal:", error);
+    }
+});
 
-                        for (let i = 1; i < cells.length - 2; i++) {
-                            const cell = cells[i];
-                            const dateHeading = table.rows[0].cells[i].textContent.trim();
-                            const date = formatDateForFirebase(dateHeading);
+      
 
-                            let value = cell.textContent.trim();
+document.getElementById("saveButton").addEventListener("click", async () => {
+    try {
+        const uniqueId = 21102002;
+        const docRef = db.collection('users').doc(uniqueId.toString());
+        const doc = await docRef.get();
 
-                            if (value === '×') {
-                                continue;
-                            }
+        if (doc.exists) {
+            const data = doc.data();
+            const taskArray = data.taskArray || []; // Ensure taskArray is defined
 
-                            const formattedDate = `${date}-${value}`;
-                            newData.push(formattedDate);
-                        }
+            const table = document.querySelector('table');
+            const rows = table.querySelectorAll('tr');
 
-                        const nameIndex = taskArray.findIndex(item => item.text === name);
-                        if (nameIndex !== -1) {
-                            taskArray[nameIndex].totalMeal = newData;
-                        }
-                    });
+            // Prepare an array to hold the updated taskArray
+            const updatedTaskArray = taskArray.map(item => ({ ...item }));
 
-                    await docRef.update({
-                        taskArray: taskArray
-                    });
-
-                    alert("Changes saved successfully!");
-                    AllTotalAmount=0;
-
-                    fetchAndGenerateTable();
-                    
-                } else {
-                    console.log("No such document!");
+            rows.forEach((row, index) => {
+                if (index === 0) {
+                    return;
                 }
-            } catch (error) {
-                console.error("Error saving changes:", error);
-            }
-        });
+
+                const cells = row.querySelectorAll('td');
+                const name = cells[0].textContent.trim();
+
+                const newData = [];
+
+                for (let i = 1; i < cells.length - 2; i++) {
+                    const cell = cells[i];
+                    const dateHeading = table.rows[0].cells[i].textContent.trim();
+                    const date = formatDateForFirebase(dateHeading);
+
+                    let value = cell.textContent.trim();
+
+                    if (value === '×') {
+                        continue;
+                    }
+
+                    const formattedDate = `${date}-${value}`;
+                    newData.push(formattedDate);
+                }
+
+                const nameIndex = updatedTaskArray.findIndex(item => item.text === name);
+                if (nameIndex !== -1) {
+                    updatedTaskArray[nameIndex].totalMeal = newData;
+                }
+            });
+
+            await docRef.update({
+                taskArray: updatedTaskArray
+            });
+
+            alert("Changes saved successfully!");
+            AllTotalAmount = 0;
+
+            fetchAndGenerateTable();
+            
+        } else {
+            console.log("No such document!");
+        }
+    } catch (error) {
+        console.error("Error saving changes:", error);
+    }
+});
+
 
         function formatDateForFirebase(dateString) {
             const [day, month, year] = dateString.split('/');
             return `${year}${month}${day}`;
         }
+
+
 
         fetchAndGenerateTable();
 // Add event listener for the delete button
@@ -437,20 +459,22 @@ document.getElementById("dltButton").addEventListener("click", async () => {
 
         const userDocRef = db.collection('users').doc(uniqueId.toString());
         const managerDocRef = db.collection('users').doc(MuniqueId);
-
-        // Deleting data from the "21102002" document
         const userDoc = await userDocRef.get();
         if (userDoc.exists) {
-    const data = userDoc.data();
-    const taskArray = data.taskArray || [];
-    for (let i = 0; i < taskArray.length; i++) {
-        taskArray[i].totalMeal = [];
-    }
-    await userDocRef.update({
-        taskArray: taskArray,
-        uniqueid: firebase.firestore.FieldValue.delete(),
-    });  
-   }else {
+            const data = userDoc.data();
+            const taskArray = data.taskArray || [];
+            
+            // Update only the totalMeal property in each object of taskArray
+            for (let i = 0; i < taskArray.length; i++) {
+                taskArray[i].totalMeal = [];
+            }
+
+            // Update the document with the modified taskArray
+            await userDocRef.update({
+                taskArray: taskArray,
+                uniqueid: firebase.firestore.FieldValue.delete(),
+            });
+        } else {
             console.log("No such user document!");
         }
 
@@ -474,6 +498,7 @@ document.getElementById("dltButton").addEventListener("click", async () => {
         console.error("Error deleting data:", error);
     }
 });
+
     </script>
       <button onclick="downloadTableAsCSV('Mess_Table.csv')">Download Table</button>
     
@@ -481,7 +506,8 @@ document.getElementById("dltButton").addEventListener("click", async () => {
       
         function downloadTableAsCSV(filename) {
           filename=new Date();
-          let tables = document.getElementsByTagName("table");           let table = tables[0]; 
+          let tables = document.getElementsByTagName("table");         
+            let table = tables[0]; 
           let rows = Array.from(table.querySelectorAll("tr"));
           let csvContent = rows.map(row => {
             let cells = Array.from(row.querySelectorAll("th, td"));
@@ -501,16 +527,17 @@ document.getElementById("dltButton").addEventListener("click", async () => {
           }
         }
       </script>
-                   <script>
+      <script>
         document.addEventListener('DOMContentLoaded', function() {
             const accessToken = localStorage.getItem('accessToken');
+            console.log(accessToken);
             if (accessToken !== 'granted') {
                 alert('You cannot access this page directly.');
-                window.location.href = 'manager.html';
+               window.location.href = 'manager.html';
             } else {
-                localStorage.removeItem('accessToken');
+              localStorage.removeItem('accessToken');
             }
         });
-                   </script>
+    </script>
 </body>
 </html>
