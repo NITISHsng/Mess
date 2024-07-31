@@ -605,7 +605,18 @@ document.getElementById('guestCountBtn').addEventListener('click', async functio
 
         // Generate the guest meal options HTML
         let guestMealOptionsHTML = document.getElementById('guestMealOptions').innerHTML; // Keep existing content
-
+        if (nextDayMode == true) {
+         guestMealOptionsHTML='';
+         for (let i=1; i <= enteredGuestCount; i++) {
+            guestMealOptionsHTML += "<label for='guest" + i + "_meal'>Guest " + i + " Meal: </label>";
+            guestMealOptionsHTML += "<select id='guest" + i + "_meal' name='guest" + i + "_meal'>";
+            guestMealOptionsHTML += "<option value='both'>Both Lunch and Dinner</option>";
+            guestMealOptionsHTML += "<option value='lunch'>Lunch Only</option>";
+            guestMealOptionsHTML += "<option value='dinner'>Dinner Only</option>";
+            guestMealOptionsHTML += "<option value='opt_out'>Opt out</option>";
+            guestMealOptionsHTML += "</select><br>";
+        }
+       }else{
         for (let i = guestCount + 1; i <= enteredGuestCount; i++) {
             guestMealOptionsHTML += "<label for='guest" + i + "_meal'>Guest " + i + " Meal: </label>";
             guestMealOptionsHTML += "<select id='guest" + i + "_meal' name='guest" + i + "_meal'>";
@@ -615,7 +626,7 @@ document.getElementById('guestCountBtn').addEventListener('click', async functio
             guestMealOptionsHTML += "<option value='opt_out'>Opt out</option>";
             guestMealOptionsHTML += "</select><br>";
         }
-
+        }
         document.getElementById('guestMealOptions').innerHTML = guestMealOptionsHTML;
 
         // Apply default meal selection and conditions to disable meal options based on the current hour
