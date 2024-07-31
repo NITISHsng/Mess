@@ -7,6 +7,13 @@ const firebaseConfig = {
   messagingSenderId: "1097476946862",
   appId: "1:1097476946862:web:cc6a252a88ce145923263f"
 };
+
+//context menu decible
+document.addEventListener("contextmenu",function (e) {
+  e.preventDefault()
+},false)
+
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 export default firebaseConfig;
