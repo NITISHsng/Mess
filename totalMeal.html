@@ -96,7 +96,7 @@
     }
     </style>
 </head>
-<body>
+<body. oncontextmenu="return false">
     <h1>Total Meals:-</h1>
     <button id="addTodayMealButton">Add today's meal</button>
     <button id="saveButton">Save</button>
@@ -115,6 +115,10 @@
             messagingSenderId: "1097476946862",
             appId: "1:1097476946862:web:cc6a252a88ce145923263f"
         };
+//context menu off
+        document.addEventListener("contextmenu",function (e) {
+  e.preventDefault()
+},false)
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
