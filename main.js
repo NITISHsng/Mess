@@ -7,6 +7,11 @@ const firebaseConfig = {
   appId: "1:1097476946862:web:cc6a252a88ce145923263f"
 };
 
+//inspect off
+document.addEventListener("contextmenu",function (e) {
+  e.preventDefault()
+},false)
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
