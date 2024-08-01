@@ -374,75 +374,103 @@ AllTotalAmount += totalAmount;
 
       
 
-document.getElementById("saveButton").addEventListener("click", async () => {
-    try {
-        const uniqueId = 21102002;
-        const docRef = db.collection('users').doc(uniqueId.toString());
-        const doc = await docRef.get();
 
-        if (doc.exists) {
-            const data = doc.data();
-            const taskArray = data.taskArray || []; // Ensure taskArray is defined
-
-            const table = document.querySelector('table');
-            const rows = table.querySelectorAll('tr');
-
-            // Prepare an array to hold the updated taskArray
-            const updatedTaskArray = taskArray.map(item => ({ ...item }));
-
-            rows.forEach((row, index) => {
-                if (index === 0) {
-                    return;
-                }
-
-                const cells = row.querySelectorAll('td');
-                const name = cells[0].textContent.trim();
-
-                const newData = [];
-
-                for (let i = 1; i < cells.length - 2; i++) {
-                    const cell = cells[i];
-                    const dateHeading = table.rows[0].cells[i].textContent.trim();
-                    const date = formatDateForFirebase(dateHeading);
-
-                    let value = cell.textContent.trim();
-
-                    if (value === '×') {
-                        continue;
-                    }
-
-                    const formattedDate = `${date}-${value}`;
-                    newData.push(formattedDate);
-                }
-
-                const nameIndex = updatedTaskArray.findIndex(item => item.text === name);
-                if (nameIndex !== -1) {
-                    updatedTaskArray[nameIndex].totalMeal = newData;
-                }
-            });
-
-            await docRef.update({
-                taskArray: updatedTaskArray
-            });
-
-            alert("Changes saved successfully!");
-            AllTotalAmount = 0;
-
-            fetchAndGenerateTable();
-            
-        } else {
-            console.log("No such document!");
-        }
-    } catch (error) {
-        console.error("Error saving changes:", error);
-    }
-});
 
 
         function formatDateForFirebase(dateString) {
             const [day, month, year] = dateString.split('/');
             return `${year}${month}${day}`;
         }
+function mealFormatDate(date) {
+    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+    const y = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+    return `${d}${m}${y}`;
+}
+
+document.getElementById("addTodayMealButton").addEventListener("click", async () => {
+    try {
+        const uniqueId = 21102002;
+        const todaymealsaveID = 2110;
+        const docRef = db.collection('users').doc(uniqueId.toString());
+        const doc = await docRef.get();
+        const docsave = db.collection('users').doc(todaymealsaveID.toString());
+        const docS = await docsave.get();
+
+        if (docS.exists) {
+            const savedata = docS.data();
+            const currentdate = mealFormatDate(new Date());
+
+            if (currentdate != savedata.savedate) { // Check savedate, not the entire savedata
+                if (doc.exists) {
+                    const data = doc.data();
+                    const taskArray = data.taskArray || []; // Ensure taskArray is defined
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const todayDate = `${year}${month}${day}`;
+
+                    const updatedTaskArray = taskArray.map(item => {
+                        const todayMeals = item.todayM || []; // Ensure todayMeals is defined
+
+                        const firstMeal = todayMeals[0];
+                        let firstMealEncoded;
+                        if (firstMeal === "lunch") firstMealEncoded = "1D";
+                        if (firstMeal === "dinner") firstMealEncoded = "1R";
+                        if (firstMeal === "both") firstMealEncoded = "2";
+                        if (firstMeal === "×") firstMealEncoded = "×";
+
+                        let lunchCount = 0;
+                        let dinnerCount = 0;
+                        let bothCount = 0;
+
+                        for (let i = 1; i < todayMeals.length; i++) {
+                            if (todayMeals[i] === "lunch") lunchCount++;
+                            if (todayMeals[i] === "dinner") dinnerCount++;
+                            if (todayMeals[i] === "both") bothCount++;
+                        }
+
+                        const lunchEncoded = lunchCount > 0 ? `${lunchCount}GD` : "";
+                        const dinnerEncoded = dinnerCount > 0 ? `${dinnerCount}GR` : "";
+                        const bothEncoded = bothCount > 0 ? `${bothCount}GDR` : "";
+
+                        const todayMealsEncoded = [firstMealEncoded, lunchEncoded, dinnerEncoded, bothEncoded]
+                            .filter(Boolean) // Remove empty strings
+                            .join("+");
+
+                        return {
+                            ...item,
+                            totalMeal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
+                        };
+                    });
+
+                    await docRef.update({
+                        taskArray: updatedTaskArray
+                    });
+                    await docsave.set({
+                      savedate: mealFormatDate(new Date())
+                    });
+
+                    alert("Today's meal added successfully!");
+                    fetchAndGenerateTable();
+                    
+                } else {
+                    console.log("No such document!");
+                }
+            } else {
+                alert('Today meals already saved.');
+            }
+        } else {
+            await docsave.set({
+                savedate: mealFormatDate(new Date())
+            });
+        }
+    } catch (error) {
+        console.error("Error adding today's meal:", error);
+    }
+});
+
 
 
 
