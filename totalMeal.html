@@ -308,70 +308,7 @@ AllTotalAmount += totalAmount;
             tableContainer.appendChild(table);
         }
 
-        document.getElementById("addTodayMealButton").addEventListener("click", async () => {
-    try {
-        const uniqueId = 21102002;
-        const docRef = db.collection('users').doc(uniqueId.toString());
-        const doc = await docRef.get();
-
-        if (doc.exists) {
-            const data = doc.data();
-            const taskArray = data.taskArray || []; // Ensure taskArray is defined
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            const todayDate = `${year}${month}${day}`;
-
-            const updatedTaskArray = taskArray.map(item => {
-                const todayMeals = item.todayM || []; // Ensure todayMeals is defined
-                
-                const firstMeal = todayMeals[0];
-                let firstMealEncoded;
-                if (firstMeal === "lunch") firstMealEncoded = "1D";
-                if (firstMeal === "dinner") firstMealEncoded = "1R";
-                if (firstMeal === "both") firstMealEncoded = "2";
-                if (firstMeal === "×") firstMealEncoded = "×";
-
-                let lunchCount = 0;
-                let dinnerCount = 0;
-                let bothCount = 0;
-
-                for (let i = 1; i < todayMeals.length; i++) {
-                    if (todayMeals[i] === "lunch") lunchCount++;
-                    if (todayMeals[i] === "dinner") dinnerCount++;
-                    if (todayMeals[i] === "both") bothCount++;
-                }
-
-                const lunchEncoded = lunchCount > 0 ? `${lunchCount}GD` : "";
-                const dinnerEncoded = dinnerCount > 0 ? `${dinnerCount}GR` : "";
-                const bothEncoded = bothCount > 0 ? `${bothCount}GDR` : "";
-
-                const todayMealsEncoded = [firstMealEncoded, lunchEncoded, dinnerEncoded, bothEncoded]
-                    .filter(Boolean)  // Remove empty strings
-                    .join("+");
-
-                return {
-                    ...item,
-                    totalMeal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
-                };
-            });
-
-            await docRef.update({
-                taskArray: updatedTaskArray
-            });
-
-            alert("Today's meal added successfully!");
-
-            fetchAndGenerateTable();
-        } else {
-            console.log("No such document!");
-        }
-    } catch (error) {
-        console.error("Error adding today's meal:", error);
-    }
-});
-
+        
       
 
 
