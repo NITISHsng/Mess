@@ -96,7 +96,7 @@
     }
     </style>
 </head>
-<body. oncontextmenu="return false">
+<body oncontextmenu="return false">
     <h1>Total Meals:-</h1>
     <button id="addTodayMealButton">Add today's meal</button>
     <button id="saveButton">Save</button>
@@ -115,10 +115,6 @@
             messagingSenderId: "1097476946862",
             appId: "1:1097476946862:web:cc6a252a88ce145923263f"
         };
-//context menu off
-        document.addEventListener("contextmenu",function (e) {
-  e.preventDefault()
-},false)
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -131,11 +127,18 @@
                 const doc = await docRef.get();
 
                 if (doc.exists) {
+                  
                     const taskArray = doc.data().taskArray;
                     const names = taskArray.map(item => item.text);
                     const mealDataArray = taskArray.map(item => item.totalMeal);
                     const AmountArray = taskArray.map(item => item.amountArray);
-                    generateTable(names, mealDataArray,AmountArray);
+                    
+                  generateTable(names, mealDataArray,AmountArray);
+                  /*
+                    console.log(mealDataArray);
+                    console.log(names);
+                    console.log(AmountArray);
+                    */
                 } else {
                     console.log("No such document!");
                 }
@@ -174,154 +177,146 @@
 
             return { R, G };
         }
-let AllTotalAmount=0;
-        function generateTable(names, mealDataArray,AmountArray) {
-   
-            const tableContainer = document.getElementById("tableContainer");
-            const table = document.createElement("table");
-
-            const headerRow = document.createElement("tr");
-            const firstHeaderCell = document.createElement("th");
-            firstHeaderCell.textContent = "Name \\ Date";
-            headerRow.appendChild(firstHeaderCell);
-
-            const dates = new Set();
-            
-            mealDataArray.forEach(mealData => {
-                mealData.forEach(meal => {
-                    const date = meal.split('-')[0];
-                    dates.add(date);
-                });
-            });
-
-            const sortedDates = Array.from(dates).sort();
-
-            sortedDates.forEach(date => {
-                const headerCell = document.createElement("th");
-                headerCell.textContent = formatDate(date);
-                headerRow.appendChild(headerCell);
-            });
-
-            const totalHeaderCell = document.createElement("th");
-            totalHeaderCell.textContent = "Total Meal / Head";
-            const AmountHeaderCell = document.createElement("th");
-            AmountHeaderCell.textContent = "Amount/Head";
-            headerRow.appendChild(totalHeaderCell);
-            headerRow.appendChild(AmountHeaderCell);
-            table.appendChild(headerRow);
-
-            const totals = {
-                TD: Array(sortedDates.length).fill(0),
-                TR: Array(sortedDates.length).fill(0),
-                TDR: Array(sortedDates.length).fill(0)
-            };
-            
-
-            names.forEach((name, nameIndex) => {
-                const row = document.createElement("tr");
-                const nameCell = document.createElement("td");
-                nameCell.textContent = name;
-                row.appendChild(nameCell);
-
-                let totalR = 0;
-                let totalG = 0;
-                sortedDates.forEach((date, dateIndex) => {
-                    var mealData = mealDataArray[nameIndex].find(meal => meal.startsWith(date));
-                    if (!mealData || mealData === "×") {
-                        mealData = `${date}-×`;
-                    }
-                    const cell = document.createElement("td");
-                    if (mealData) {
-                        const mealDetails = mealData.split('-')[1];
-                        cell.textContent = mealDetails;
-                        const { R, G } = decodeCode(mealDetails);
-                        totalR += R;
-                        totalG += G;
-                        totals.TD[dateIndex] += R;
-                        totals.TR[dateIndex] += G;
-                        totals.TDR[dateIndex] += (R + G);
-                        cell.addEventListener('click', () => {
-                            const oldValue = cell.textContent.trim();
-                            const newValue = prompt("Enter new value:", oldValue);
-
-                            if (newValue !== null && newValue !== '') {
-                                cell.textContent = newValue;
-
-                                mealDataArray[nameIndex] = mealDataArray[nameIndex].map(meal => {
-                                    if (meal.startsWith(date)) {
-                                        return `${date}-${newValue}`;
-                                    }
-                                    return meal;
-                                });
-                            } else {
-                                
-                            }
-                        });
-                    } else {
-                        cell.textContent = "×";
-                        cell.classList.add("editable");
-                    }
-                    row.appendChild(cell);
-                });
-
-                const totalCell = document.createElement("td");
-                totalCell.innerHTML = `Rm=${totalR},Gm=${totalG},Tm=${totalR + totalG}`;
-                row.appendChild(totalCell);
-                table.appendChild(row);
-                           
-let abc= AmountArray[nameIndex];
-let totalAmount = 0;  
-for (let i = 0; i < abc.length; i++) {
-    totalAmount += parseInt(abc[i].amount);
-}
-AllTotalAmount += totalAmount;  
-                const Amount = document.createElement("td");
-                Amount.innerHTML =totalAmount;
-                row.appendChild(Amount);
-                
-                table.appendChild(row);
-            });
-
-            const totalRow = document.createElement("tr");
-            const totalLabelCell = document.createElement("td");
-            totalLabelCell.textContent = "Total Meal / Day";
-            totalRow.appendChild(totalLabelCell);
-
-            totals.TD.forEach((td, index) => {
-                const totalCell = document.createElement("td");
-                totalCell.innerHTML = `TDR=${totals.TDR[index]}`;
-                totalRow.appendChild(totalCell);
-            });
-
-            let totalT = 0;
-            totals.TDR.forEach(total => {
-                totalT += total;
-            });
-            const totalTCell = document.createElement("td");
-            totalTCell.textContent = `Total Meal=${totalT}`;
-           const AllAmout = document.createElement("td");
-            AllAmout.textContent =`${AllTotalAmount}`;
-            totalRow.appendChild(totalTCell);
-            totalRow.appendChild(AllAmout);
-            table.appendChild(totalRow);
-            tableContainer.innerHTML = "";
-            tableContainer.appendChild(table);
-        }
-
         
-      
+let AllTotalAmount=0;
+        function generateTable(names, mealDataArray, amountArray) {
+    const tableContainer = document.getElementById("tableContainer");
+    const table = document.createElement("table");
 
+    const headerRow = document.createElement("tr");
+    const firstHeaderCell = document.createElement("th");
+    firstHeaderCell.textContent = "Name \\ Date";
+    headerRow.appendChild(firstHeaderCell);
 
+    const dates = new Set();
+    
+    mealDataArray.forEach(mealData => {
+        mealData.forEach(meal => {
+            const date = meal.split('-')[0];
+            dates.add(date);
+        });
+    });
 
+    const sortedDates = Array.from(dates).sort();
 
-        function formatDateForFirebase(dateString) {
-            const [day, month, year] = dateString.split('/');
-            return `${year}${month}${day}`;
+    sortedDates.forEach(date => {
+        const headerCell = document.createElement("th");
+        headerCell.textContent = formatDate(date);
+        headerRow.appendChild(headerCell);
+    });
+
+    const totalHeaderCell = document.createElement("th");
+    totalHeaderCell.textContent = "Total Meal / Head";
+    const amountHeaderCell = document.createElement("th");
+    amountHeaderCell.textContent = "Amount/Head";
+    headerRow.appendChild(totalHeaderCell);
+    headerRow.appendChild(amountHeaderCell);
+    table.appendChild(headerRow);
+
+    const totals = {
+        TD: Array(sortedDates.length).fill(0),
+        TR: Array(sortedDates.length).fill(0),
+        TDR: Array(sortedDates.length).fill(0)
+    };
+
+    let allTotalAmount = 0;
+
+    names.forEach((name, nameIndex) => {
+        const row = document.createElement("tr");
+        const nameCell = document.createElement("td");
+        nameCell.textContent = name;
+        row.appendChild(nameCell);
+
+        let totalR = 0;
+        let totalG = 0;
+        
+        sortedDates.forEach((date, dateIndex) => {
+            let mealData = mealDataArray[nameIndex].find(meal => meal.startsWith(date));
+            if (!mealData || mealData === "×") {
+                mealData = `${date}-×`;
+            }
+            const cell = document.createElement("td");
+            if (mealData) {
+                const mealDetails = mealData.split('-')[1];
+                cell.textContent = mealDetails;
+                const { R, G } = decodeCode(mealDetails);
+                totalR += R;
+                totalG += G;
+                totals.TD[dateIndex] += R;
+                totals.TR[dateIndex] += G;
+                totals.TDR[dateIndex] += (R + G);
+                cell.addEventListener('click', () => {
+                    const oldValue = cell.textContent.trim();
+                    const newValue = prompt("Enter new value:", oldValue);
+
+                    if (newValue !== null && newValue !== '') {
+                        cell.textContent = newValue;
+                        mealDataArray[nameIndex] = mealDataArray[nameIndex].map(meal => {
+                            if (meal.startsWith(date)) {
+                                return `${date}-${newValue}`;
+                            }
+                            return meal;
+                        });
+                    }
+                });
+            } else {
+                cell.textContent = "×";
+                cell.classList.add("editable");
+            }
+            row.appendChild(cell);
+        });
+
+        const totalCell = document.createElement("td");
+        totalCell.innerHTML = `Rm=${totalR},Gm=${totalG},Tm=${totalR + totalG}`;
+        row.appendChild(totalCell);
+
+        let totalAmount = 0;  
+        const amounts = amountArray[nameIndex];
+        for (let i = 0; i < amounts.length; i++) {
+            totalAmount += parseInt(amounts[i].amount, 10);
         }
-function mealFormatDate(date) {
+        allTotalAmount += totalAmount;  
+
+        const amountCell = document.createElement("td");
+        amountCell.textContent = totalAmount;
+        row.appendChild(amountCell);
+
+        table.appendChild(row);
+    });
+
+    const totalRow = document.createElement("tr");
+    const totalLabelCell = document.createElement("td");
+    totalLabelCell.textContent = "Total Meal / Day";
+    totalRow.appendChild(totalLabelCell);
+
+    totals.TD.forEach((td, index) => {
+        const totalCell = document.createElement("td");
+        totalCell.textContent = `TDR=${totals.TDR[index]}`;
+        totalRow.appendChild(totalCell);
+    });
+
+    const totalT = totals.TDR.reduce((sum, total) => sum + total, 0);
+    const totalTCell = document.createElement("td");
+    totalTCell.textContent = `Total Meal=${totalT}`;
+
+    const allAmountCell = document.createElement("td");
+    allAmountCell.textContent = `${allTotalAmount}`;
+
+    totalRow.appendChild(totalTCell);
+    totalRow.appendChild(allAmountCell);
+
+    table.appendChild(totalRow);
+
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+}
+
+
+
+        function mealFormatDate(date) {
     const d = date.getDate().toString().padStart(2, '0');
-    const m = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-    const y = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+    const m = (date.getMonth() + 1).toString().padStart(2, '0'); 
+    const y = date.getFullYear().toString().slice(-2); 
     return `${d}${m}${y}`;
 }
 
@@ -388,7 +383,6 @@ document.getElementById("addTodayMealButton").addEventListener("click", async ()
                     await docsave.set({
                       savedate: mealFormatDate(new Date())
                     });
-
                     alert("Today's meal added successfully!");
                     fetchAndGenerateTable();
                     
@@ -407,6 +401,71 @@ document.getElementById("addTodayMealButton").addEventListener("click", async ()
         console.error("Error adding today's meal:", error);
     }
 });
+
+
+document.getElementById("saveButton").addEventListener("click", async () => {
+            try {
+                const uniqueId = 21102002;
+                const docRef = db.collection('users').doc(uniqueId.toString());
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const taskArray = doc.data().taskArray;
+
+                    const table = document.querySelector('table');
+const rows = table.querySelectorAll('tr');
+const headers = rows[0].querySelectorAll('th');  // For headers
+
+for (let i = 1; i < rows.length-1; i++) {
+    const row = rows[i];
+    const cells = row.querySelectorAll('td');
+    const name = cells[0].textContent.trim();
+
+    const newData = [];
+
+    for (let j = 1; j < cells.length - 2; j++) {
+        const cell = cells[j];
+        const dateHeading = headers[j].textContent.trim();
+        const date = formatDateForFirebase(dateHeading);
+
+        let value = cell.textContent.trim();
+/*
+        if (value === '×') {
+            continue;
+        }
+        */
+
+        const formattedDate = `${date}-${value}`;
+        newData.push(formattedDate);
+    }
+
+    const nameIndex = taskArray.findIndex(item => item.text === name);
+    if (nameIndex !== -1) {
+        taskArray[nameIndex].totalMeal = newData;
+    }
+}
+// console.log(taskArray);
+await docRef.update({
+    taskArray: taskArray
+});
+
+                    alert("Changes saved successfully!");
+                    AllTotalAmount=0;
+
+                    fetchAndGenerateTable();
+                    
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.error("Error saving changes:", error);
+            }
+        });
+
+        function formatDateForFirebase(dateString) {
+            const [day, month, year] = dateString.split('/');
+            return `${year}${month}${day}`;
+        }
 
 
 
@@ -475,7 +534,7 @@ document.getElementById("dltButton").addEventListener("click", async () => {
       
         function downloadTableAsCSV(filename) {
           filename=new Date();
-          let tables = document.getElementsByTagName("table");         
+          let tables = document.getElementsByTagName("table");        
             let table = tables[0]; 
           let rows = Array.from(table.querySelectorAll("tr"));
           let csvContent = rows.map(row => {
@@ -499,14 +558,21 @@ document.getElementById("dltButton").addEventListener("click", async () => {
       <script>
         document.addEventListener('DOMContentLoaded', function() {
             const accessToken = localStorage.getItem('accessToken');
-            console.log(accessToken);
+           // console.log(accessToken);
             if (accessToken !== 'granted') {
                 alert('You cannot access this page directly.');
-               window.location.href = 'manager.html';
+             window.location.href = 'manager.html';
             } else {
               localStorage.removeItem('accessToken');
             }
         });
+        
+        
+
+    </script>
+    <script>
+      
+      
     </script>
 </body>
 </html>
