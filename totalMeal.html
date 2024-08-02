@@ -134,11 +134,7 @@
                     const AmountArray = taskArray.map(item => item.amountArray);
                     
                   generateTable(names, mealDataArray,AmountArray);
-                  /*
-                    console.log(mealDataArray);
-                    console.log(names);
-                    console.log(AmountArray);
-                    */
+                    
                 } else {
                     console.log("No such document!");
                 }
@@ -233,7 +229,7 @@ let AllTotalAmount=0;
         sortedDates.forEach((date, dateIndex) => {
             let mealData = mealDataArray[nameIndex].find(meal => meal.startsWith(date));
             if (!mealData || mealData === "×") {
-                mealData = `${date}-×`;
+             mealData = `${date}-×`;
             }
             const cell = document.createElement("td");
             if (mealData) {
@@ -249,7 +245,7 @@ let AllTotalAmount=0;
                     const oldValue = cell.textContent.trim();
                     const newValue = prompt("Enter new value:", oldValue);
 
-                    if (newValue !== null && newValue !== '') {
+                   if (newValue !== null && newValue !== '') {
                         cell.textContent = newValue;
                         mealDataArray[nameIndex] = mealDataArray[nameIndex].map(meal => {
                             if (meal.startsWith(date)) {
@@ -257,7 +253,7 @@ let AllTotalAmount=0;
                             }
                             return meal;
                         });
-                    }
+                  }
                 });
             } else {
                 cell.textContent = "×";
@@ -307,7 +303,7 @@ let AllTotalAmount=0;
 
     table.appendChild(totalRow);
 
-    tableContainer.innerHTML = "";
+    tableContainer.innerHTML = "y";
     tableContainer.appendChild(table);
 }
 
@@ -373,7 +369,37 @@ document.getElementById("addTodayMealButton").addEventListener("click", async ()
 
                         return {
                             ...item,
-                            totalMdocument.getElementById("saveButton").addEventListener("click", async () => {
+                            totalMeal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
+                        };
+                    });
+
+                    await docRef.update({
+                        taskArray: updatedTaskArray
+                    });
+                    await docsave.set({
+                      savedate: mealFormatDate(new Date())
+                    });
+                    alert("Today's meal added successfully!");
+                    fetchAndGenerateTable();
+                    
+                } else {
+                    console.log("No such document!");
+                }
+            } else {
+                alert('Today meals already saved.');
+            }
+        } else {
+            await docsave.set({
+                savedate: mealFormatDate(new Date())
+            });
+        }
+    } catch (error) {
+        console.error("Error adding today's meal:", error);
+    }
+});
+
+
+document.getElementById("saveButton").addEventListener("click", async () => {
             try {
                 const uniqueId = 21102002;
                 const docRef = db.collection('users').doc(uniqueId.toString());
@@ -414,37 +440,7 @@ await docRef.update({
             } catch (error) {
                 console.error("Error saving changes:", error);
             }
-        });eal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
-                        };
-                    });
-
-                    await docRef.update({
-                        taskArray: updatedTaskArray
-                    });
-                    await docsave.set({
-                      savedate: mealFormatDate(new Date())
-                    });
-                    alert("Today's meal added successfully!");
-                    fetchAndGenerateTable();
-                    
-                } else {
-                    console.log("No such document!");
-                }
-            } else {
-                alert('Today meals already saved.');
-            }
-        } else {
-            await docsave.set({
-                savedate: mealFormatDate(new Date())
-            });
-        }
-    } catch (error) {
-        console.error("Error adding today's meal:", error);
-    }
-});
-
-
-
+        });
 
         function formatDateForFirebase(dateString) {
             const [day, month, year] = dateString.split('/');
@@ -518,8 +514,7 @@ document.getElementById("dltButton").addEventListener("click", async () => {
       
         function downloadTableAsCSV(filename) {
           filename=new Date();
-          let tables = document.getElementsByTagName("table");        
-            let table = tables[0]; 
+          let tables = document.getElementsByTagName("table");          let table = tables[0]; 
           let rows = Array.from(table.querySelectorAll("tr"));
           let csvContent = rows.map(row => {
             let cells = Array.from(row.querySelectorAll("th, td"));
@@ -545,7 +540,7 @@ document.getElementById("dltButton").addEventListener("click", async () => {
            // console.log(accessToken);
             if (accessToken !== 'granted') {
                 alert('You cannot access this page directly.');
-             window.location.href = 'manager.html';
+            window.location.href = 'manager.html';
             } else {
               localStorage.removeItem('accessToken');
             }
@@ -553,10 +548,6 @@ document.getElementById("dltButton").addEventListener("click", async () => {
         
         
 
-    </script>
-    <script>
-      
-      
     </script>
 </body>
 </html>
