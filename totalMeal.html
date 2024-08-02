@@ -373,7 +373,48 @@ document.getElementById("addTodayMealButton").addEventListener("click", async ()
 
                         return {
                             ...item,
-                            totalMeal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
+                            totalMdocument.getElementById("saveButton").addEventListener("click", async () => {
+            try {
+                const uniqueId = 21102002;
+                const docRef = db.collection('users').doc(uniqueId.toString());
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const taskArray = doc.data().taskArray;
+                    const table = document.querySelector('table');
+const rows = table.querySelectorAll('tr');
+const headers = rows[0].querySelectorAll('th');  // For headers
+
+for (let i = 1; i < rows.length-1; i++) {
+    const row = rows[i];
+    const cells = row.querySelectorAll('td');
+    var name = cells[0].textContent.trim();
+    const newData = [];
+    for (let j = 1; j < cells.length - 2; j++) {
+        const cell = cells[j];
+        const dateHeading = headers[j].textContent.trim();
+        const date = formatDateForFirebase(dateHeading);
+        let value = cell.textContent.trim();
+      const formattedDate = `${date}-${value}`;
+        newData.push(formattedDate);
+    }
+        taskArray[i-1].totalMeal = newData;
+}
+
+await docRef.update({
+    taskArray: taskArray
+});
+
+                    alert("Changes saved successfully!");
+                    AllTotalAmount=0;
+                    fetchAndGenerateTable();
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.error("Error saving changes:", error);
+            }
+        });eal: item.totalMeal ? [...item.totalMeal, `${todayDate}-${todayMealsEncoded}`] : [`${todayDate}-${todayMealsEncoded}`]
                         };
                     });
 
@@ -403,64 +444,7 @@ document.getElementById("addTodayMealButton").addEventListener("click", async ()
 });
 
 
-document.getElementById("saveButton").addEventListener("click", async () => {
-            try {
-                const uniqueId = 21102002;
-                const docRef = db.collection('users').doc(uniqueId.toString());
-                const doc = await docRef.get();
 
-                if (doc.exists) {
-                    const taskArray = doc.data().taskArray;
-
-                    const table = document.querySelector('table');
-const rows = table.querySelectorAll('tr');
-const headers = rows[0].querySelectorAll('th');  // For headers
-
-for (let i = 1; i < rows.length-1; i++) {
-    const row = rows[i];
-    const cells = row.querySelectorAll('td');
-    const name = cells[0].textContent.trim();
-
-    const newData = [];
-
-    for (let j = 1; j < cells.length - 2; j++) {
-        const cell = cells[j];
-        const dateHeading = headers[j].textContent.trim();
-        const date = formatDateForFirebase(dateHeading);
-
-        let value = cell.textContent.trim();
-/*
-        if (value === '×') {
-            continue;
-        }
-        */
-
-        const formattedDate = `${date}-${value}`;
-        newData.push(formattedDate);
-    }
-
-    const nameIndex = taskArray.findIndex(item => item.text === name);
-    if (nameIndex !== -1) {
-        taskArray[nameIndex].totalMeal = newData;
-    }
-}
-// console.log(taskArray);
-await docRef.update({
-    taskArray: taskArray
-});
-
-                    alert("Changes saved successfully!");
-                    AllTotalAmount=0;
-
-                    fetchAndGenerateTable();
-                    
-                } else {
-                    console.log("No such document!");
-                }
-            } catch (error) {
-                console.error("Error saving changes:", error);
-            }
-        });
 
         function formatDateForFirebase(dateString) {
             const [day, month, year] = dateString.split('/');
